@@ -1,4 +1,4 @@
-name: Build Rathole for mipsel (static)
+name: Build Rathole for mipsel (cross)
 
 on:
   workflow_dispatch:
@@ -6,22 +6,17 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container:
-      image: rust:nightly          # 使用官方 nightly 镜像，Cargo 支持 2024 edition
     steps:
       - uses: actions/checkout@v4
 
-      - name: Ensure latest nightly and rust-src
+      - name: Install cross
         run: |
-          rustup update nightly
-          rustup default nightly
-          rustup component add rust-src --toolchain nightly
+          cargo install cross --git https://github.com/cross-rs/cross
 
-      - name: Build static rathole
+      - name: Build static rathole with cross
         run: |
-          cargo build --release \
+          cross build --release \
             --target mipsel-unknown-linux-musl \
-            -Z build-std=std,core,alloc \
             --no-default-features \
             --features "client"
 
