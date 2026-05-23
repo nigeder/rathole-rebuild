@@ -6,16 +6,18 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    container:
+      image: rust:nightly          # 使用官方 nightly 镜像，Cargo 支持 2024 edition
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install specific nightly (supports edition 2024)
-        uses: dtolnay/rust-toolchain@nightly
-        with:
-          toolchain: nightly-2025-08-01
-          components: rust-src
+      - name: Ensure latest nightly and rust-src
+        run: |
+          rustup update nightly
+          rustup default nightly
+          rustup component add rust-src --toolchain nightly
 
-      - name: Build static rathole (client only)
+      - name: Build static rathole
         run: |
           cargo build --release \
             --target mipsel-unknown-linux-musl \
