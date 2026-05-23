@@ -9,15 +9,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Rust nightly
-        run: |
-          rustup install nightly-2024-12-01
-          rustup default nightly-2024-12-01
-          rustup component add rust-src --toolchain nightly-2024-12-01
+      - name: Install latest nightly Rust
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rust-src
 
-      - name: Build static rathole
+      - name: Build static rathole (client only)
         run: |
-          export RUSTFLAGS="-C target-feature=+crt-static"
           cargo build --release \
             --target mipsel-unknown-linux-musl \
             -Z build-std=std,core,alloc \
