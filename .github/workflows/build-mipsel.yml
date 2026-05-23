@@ -9,9 +9,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install latest nightly Rust
+      - name: Install specific nightly (supports edition 2024)
         uses: dtolnay/rust-toolchain@nightly
         with:
+          toolchain: nightly-2025-08-01
           components: rust-src
 
       - name: Build static rathole (client only)
