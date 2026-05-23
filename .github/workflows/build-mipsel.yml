@@ -9,16 +9,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Rust nightly
-        run: |
-          rustup install nightly
-          rustup default nightly
-          rustup component add rust-src --toolchain nightly
+      - name: Install Rust nightly
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          targets: mipsel-unknown-linux-musl
+          components: rust-src
 
       - name: Build static rathole (client only)
         run: |
           export RUSTFLAGS="-C target-feature=+crt-static"
-          cargo build --release \
+          cargo +nightly build --release \
             --target mipsel-unknown-linux-musl \
             -Z build-std=std,core,alloc \
             --no-default-features \
