@@ -1,0 +1,33 @@
+name: Build Rathole for mipsel (static)
+
+on:
+  workflow_dispatch:          # 允许你手动触发
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Setup Rust nightly
+        run: |
+          rustup install nightly
+          # 安装 mipsel-unknown-linux-musl 的源码支持，后面用 build-std 编译
+          rustup component add rust-src --toolchain nightly
+
+      - name: Build static rathole
+        run: |
+          # 设置环境变量，确保链接成静态二进制文件
+          export RUSTFLAGS="-C target-feature=+crt-static"
+          cargo +nightly build --release \
+            --target mipsel-unknown-linux-musl \
+            -Z build-std=std,core,alloc \
+            --no-default-features \
+            --features "client,websocket"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: rathole-mipsel-static
+          path: target/mipsel-unknown-linux-musl/release/rathole
