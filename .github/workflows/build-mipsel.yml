@@ -1,31 +1,11 @@
-name: Build Rathole for mipsel (no cargo-hack)
-
-on:
-  workflow_dispatch:
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    container:
-      image: rust:nightly           # 使用官方 nightly 镜像，Cargo 足够新
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Remove cargo-hack dependency
-        run: sed -i '/cargo-hack/d' Cargo.toml
-
-      - name: Add rust-src and build
-        run: |
-          rustup default nightly
-          rustup component add rust-src --toolchain nightly
-          cargo build --release \
-            --target mipsel-unknown-linux-musl \
-            -Z build-std=std,core,alloc \
-            --no-default-features \
-            --features "client"
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: rathole-mipsel-static
-          path: target/mipsel-unknown-linux-musl/release/rathole
+- name: Build static rathole (force latest Cargo)
+  run: |
+    rustup update nightly
+    rustup default nightly
+    rustup component add rust-src --toolchain nightly
+    cargo update          # 更新所有依赖到最新兼容版本
+    cargo build --release \
+      --target mipsel-unknown-linux-musl \
+      -Z build-std=std,core,alloc \
+      --no-default-features \
+      --features "client"
